@@ -3,52 +3,25 @@
  */
 package com.qmetry.qaf.automation.support.perfecto;
 
-import static com.qmetry.qaf.automation.core.ConfigurationManager.getBundle;
-import com.perfectomobile.httpclient.Credentials;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import com.qmetry.qaf.automation.ui.WebDriverTestBase;
+import com.qmetry.qaf.automation.util.Validator;
+import org.hamcrest.Matchers;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.RemoteExecuteMethod;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.configuration.ConfigurationConverter;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.SubnodeConfiguration;
-import org.hamcrest.Matchers;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.DriverCommand;
-import org.openqa.selenium.remote.RemoteExecuteMethod;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
-import com.qmetry.qaf.automation.core.AutomationError;
-import com.qmetry.qaf.automation.keys.ApplicationProperties;
-import com.qmetry.qaf.automation.ui.WebDriverTestBase;
-import com.qmetry.qaf.automation.util.PropertyUtil;
-import com.qmetry.qaf.automation.util.StringUtil;
-import com.qmetry.qaf.automation.util.Validator;
-import com.qmetry.qaf.automation.ws.rest.RestTestBase;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import static com.qmetry.qaf.automation.core.ConfigurationManager.getBundle;
 
 /**
  * @author chirag.jayswal
@@ -65,94 +38,6 @@ public class PerfectoUtils {
 	private static final String UPLOAD_OPERATION = "operation=upload&overwrite=true";
 	private static final String UTF_8 = "UTF-8";
 
-	public static String getPerfectoHost(String url) {
-		String hostSufix = "perfectomobile.com";
-		if (StringUtil.isBlank(url) || url.indexOf(hostSufix) <= 0) {
-			throw new RuntimeException("Invalide perfecto remote url: " + url);
-		}
-
-		return url.substring(0, url.indexOf(hostSufix)) + hostSufix;
-	}
-
-	/**
-	 * refer https://community.perfectomobile.com/series/20095/posts/943233 for
-	 * parameters
-	 * 
-	 * @param params
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<String> getDeviceIds(Map<String, String> params) {
-		try {
-			return readDevicesProperties(params).getList("handset.deviceId");
-		} catch (Exception e) {
-			throw new AutomationError("Unable to get device id", e);
-		}
-	}
-	
-	private static PropertyUtil readDevicesProperties(Map<String, String> params) throws ConfigurationException, UnsupportedEncodingException{
-			RestTestBase testBase = new RestTestBase();
-			String cloudeBaseUrl =
-					getPerfectoHost(ApplicationProperties.REMOTE_SERVER.getStringVal());
-			WebResource resource = testBase.getClient().resource(
-					cloudeBaseUrl + LIST_HANDSETS + "&" + getQueryString(params));
-			ClientResponse resp = resource.get(ClientResponse.class);
-
-			PropertyUtil devices = new PropertyUtil();
-			InputStream stream = new ByteArrayInputStream(
-					resp.getEntity(String.class).getBytes(StandardCharsets.UTF_8));
-			devices.load(stream);
-
-			return devices;
-			
-	}
-	
-	/**
-	 * refer https://community.perfectomobile.com/series/20095/posts/943233 for
-	 * parameters
-	 * TODO: need to complete implementation.....
-	 * @param params
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static Map<Object, Object> getDeviceProperties(Map<String, String> params) {
-		try {
-			return ConfigurationConverter.getMap(readDevicesProperties(params).subset("handset"));
-		} catch (Exception e) {
-			throw new AutomationError("Unable to get device id", e);
-		}
-	}
-
-	/**
-	 * refer https://community.perfectomobile.com/series/20095/posts/943233 for
-	 * parameters
-	 * 
-	 * @param params
-	 * @return
-	 */
-	public static List<String> getDeviceIds(DesiredCapabilities capabilities) {
-		try {
-
-			Map<String, String> paramMap = new HashMap<String, String>();
-			Map<String, ?> capMap = capabilities.asMap();
-			for (String key : capMap.keySet()) {
-				String pkey = key;
-				if (key.equalsIgnoreCase(CapabilityType.PLATFORM)) {
-					pkey = "os";
-				}
-				if (key.equalsIgnoreCase(CapabilityType.VERSION)) {
-					pkey = "osVersion";
-				}
-				paramMap.put(pkey, capMap.get(key).toString());
-			}
-			if (!paramMap.containsKey("inUse")) {
-				paramMap.put("inUse", "false");
-			}
-			return getDeviceIds(paramMap);
-		} catch (Exception e) {
-			throw new AutomationError("Unable to get device id", e);
-		}
-	}
 
 	/**
 	 * Download the report. type - pdf, html, csv, xml Example:
@@ -674,52 +559,5 @@ public class PerfectoUtils {
 			params.put("key", repositoryPath);
 		}
 		driver.executeScript("mobile:screen:image", params);
-	}
-
-	/**
-	 * Checks if is device.
-	 *
-	 * @param driver
-	 *            capabilities
-	 * @return true, if is device
-	 */
-	public static boolean isDevice(Capabilities caps) {
-		// first check if driver is a mobile device:
-		if (isDesktopBrowser(caps))
-			return false;
-		return caps.getCapability("deviceName") != null;
-	}
-
-	public static boolean isDesktopBrowser(Capabilities caps) {
-		// first check if deviceName set to browser name which triggers desktop:
-		return Arrays
-				.asList("firefox", "chrome", "iexplorer", "internet explorer", "safari")
-				.contains((caps.getCapability("browserVersion") + "").toLowerCase());
-	}
-
-	/**
-	 * Checks if is device.
-	 *
-	 *TODO: complete me
-	 * @param driver
-	 *            the driver
-	 * @return true, if is device
-	 */
-	public static boolean isDevice(RemoteWebDriver driver) {
-		return isDevice(driver.getCapabilities());
-	}
-	
-	 public static Map<String, Object> getDeviceProperties(Capabilities capabilities) {
-	        Map<String, Object> deviceProperties = new HashMap<String, Object>();
-
-	        if (!isDevice(capabilities))
-	            return deviceProperties;
-
-	        try {
-			//	return ConfigurationConverter.getMap(readDevicesProperties(params).subset("handset"));
-			} catch (Exception e) {
-				throw new AutomationError("Unable to get device id", e);
-			}
-	        return deviceProperties;
 	}
 }
