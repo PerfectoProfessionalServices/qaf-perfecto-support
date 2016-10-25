@@ -29,23 +29,17 @@
 
 package com.qmetry.qaf.automation.support.perfecto;
 
-import static com.qmetry.qaf.automation.core.ConfigurationManager.getBundle;
-import static com.qmetry.qaf.automation.step.PerfectoMobileSteps.installApp;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.getDeviceIds;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.qmetry.qaf.automation.ui.WebDriverTestBase;
+import com.qmetry.qaf.automation.ui.webdriver.QAFExtendedWebDriver;
 import org.apache.commons.configuration.ConfigurationException;
 import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.qmetry.qaf.automation.ui.WebDriverTestBase;
-import com.qmetry.qaf.automation.ui.webdriver.QAFExtendedWebDriver;
+import java.util.*;
+
+import static com.qmetry.qaf.automation.core.ConfigurationManager.getBundle;
+import static com.qmetry.qaf.automation.step.PerfectoMobileSteps.installApp;
 
 /**
  * @author chirag.jayswal
@@ -74,10 +68,10 @@ public class PefectoDeviceAppInstaller {
 
 		Map<String, String> params = new HashMap<String, String>();
 
-		params.put("os", "driver.capabilities.platformName");
+		params.put("os", getBundle().getPropertyValue("driver.capabilities.platformName"));
 		params.put("inUse", "false");
 
-		for (Object deviceId : getDeviceIds(params)) {
+		for (Object deviceId : CloudUtils.getDeviceList(CloudUtils.convertMapToParameters(params))) {
 			lst.add(new Object[]{deviceId});
 		}
 

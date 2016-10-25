@@ -29,20 +29,19 @@
 
 package com.qmetry.qaf.automation.support.perfecto;
 
-import static com.qmetry.qaf.automation.core.ConfigurationManager.getBundle;
-import static com.qmetry.qaf.automation.step.PerfectoMobileSteps.closeApplication;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoIDEConnectorUtil.getExecutionIdCapability;
-
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.DriverCommand;
-import org.openqa.selenium.remote.RemoteExecuteMethod;
-
 import com.google.common.collect.ImmutableMap;
 import com.qmetry.qaf.automation.ui.webdriver.CommandTracker;
 import com.qmetry.qaf.automation.ui.webdriver.QAFExtendedWebDriver;
 import com.qmetry.qaf.automation.ui.webdriver.QAFWebDriverCommandAdapter;
 import com.qmetry.qaf.automation.util.StringUtil;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.RemoteExecuteMethod;
+
+import static com.qmetry.qaf.automation.core.ConfigurationManager.getBundle;
+import static com.qmetry.qaf.automation.step.PerfectoMobileSteps.closeApplication;
+import static com.qmetry.qaf.automation.support.perfecto.PerfectoIDEConnectorUtil.getExecutionIdCapability;
 
 /**
  * @author chirag.jayswal (chirag.jayswal@infostretch.com)
@@ -84,6 +83,7 @@ public class PerfectoDriverListener extends QAFWebDriverCommandAdapter {
 
 	@Override
 	public void onInitialize(QAFExtendedWebDriver driver) {
+		CloudUtils.addDeviceProperties((DesiredCapabilities)driver.getCapabilities());
 		String appName =
 				(String) driver.getCapabilities().getCapability("applicationName");
 		if (StringUtil.isNotBlank(appName))

@@ -29,14 +29,6 @@
 
 package com.qmetry.qaf.automation.support.perfecto;
 
-import static com.qmetry.qaf.automation.core.ConfigurationManager.getBundle;
-
-import java.util.List;
-
-import org.testng.ITestContext;
-import org.testng.ITestListener;
-import org.testng.ITestResult;
-
 import com.perfecto.reportium.client.ReportiumClient;
 import com.perfecto.reportium.client.ReportiumClientFactory;
 import com.perfecto.reportium.model.Job;
@@ -51,6 +43,13 @@ import com.qmetry.qaf.automation.step.StepExecutionTracker;
 import com.qmetry.qaf.automation.step.client.TestNGScenario;
 import com.qmetry.qaf.automation.ui.WebDriverTestBase;
 import com.qmetry.qaf.automation.ui.webdriver.QAFExtendedWebDriver;
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+
+import java.util.List;
+
+import static com.qmetry.qaf.automation.core.ConfigurationManager.getBundle;
 
 /**
  * This class transmits test results including each test step directly to
@@ -64,9 +63,7 @@ import com.qmetry.qaf.automation.ui.webdriver.QAFExtendedWebDriver;
  * 
  * @author chirag.jayswal
  */
-public class PerfectoReportiumConnector extends QAFTestStepAdapter
-		implements
-			ITestListener {
+public class PerfectoReportiumConnector extends QAFTestStepAdapter implements ITestListener {
 	private static final String PERFECTO_REPORT_CLIENT = "perfecto.report.client";
 
 	@Override
@@ -78,27 +75,41 @@ public class PerfectoReportiumConnector extends QAFTestStepAdapter
 
 			reportClient.testStart(testResult.getMethod().getMethodName(), context);
 			addReportLink(testResult, reportClient.getReportUrl());
+			ConsoleUtils.surroundWithSquare("TEST STARTED: " + testResult.getTestName() + (testResult.getParameters().length > 0 ? " [" + testResult.getParameters()[0] + "]" : ""));
 		}
 	}
 
 	@Override
 	public void beforExecute(StepExecutionTracker stepExecutionTracker) {
+		String msg = "BEGIN STEP: " + stepExecutionTracker.getStep().getDescription();
+		ConsoleUtils.logInfoBlocks(msg, ConsoleUtils.lower_block + " ", 10);
 		logTestStep(stepExecutionTracker.getStep().getDescription());
+	}
+
+	@Override
+	public void afterExecute(StepExecutionTracker stepExecutionTracker) {
+		String msg = "END STEP: " + stepExecutionTracker.getStep().getDescription();
+		ConsoleUtils.logInfoBlocks(msg, ConsoleUtils.upper_block + " ", 10);
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult testResult) {
 		ReportiumClient client = getReportiumClient();
-		if (null != client)
+		if (null != client) {
 			client.testStop(TestResultFactory.createSuccess());
+			logTestEnd(testResult);
+		}
+
 	}
 
 	@Override
 	public void onTestFailure(ITestResult testResult) {
 		ReportiumClient client = getReportiumClient();
-		if (null != client)
+		if (null != client) {
 			client.testStop(TestResultFactory.createFailure("An error occurred",
 					testResult.getThrowable()));
+			logTestEnd(testResult);
+		}
 	}
 
 	@Override
@@ -139,7 +150,6 @@ public class PerfectoReportiumConnector extends QAFTestStepAdapter
 
 	@Override
 	public void onFinish(ITestContext context) {
-		// do nothing
 	}
 
 	public static void logTestStep(String message) {
@@ -148,6 +158,11 @@ public class PerfectoReportiumConnector extends QAFTestStepAdapter
 		} catch (Exception e) {
 			// ignore...
 		}
+	}
+
+	private static void logTestEnd(ITestResult testResult){
+		ConsoleUtils.logWarningBlocks("REPORTIUM URL: " + getReportiumClient().getReportUrl().replace("[", "%5B").replace("]", "%5D"));
+		ConsoleUtils.surroundWithSquare("TEST FINISHED: " + testResult.getTestName() + (testResult.getParameters().length > 0 ? " [" + testResult.getParameters()[0] + "]" : ""));
 	}
 
 	private static ReportiumClient getReportiumClient() {

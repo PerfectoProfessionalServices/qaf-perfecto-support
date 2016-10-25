@@ -16,6 +16,10 @@
 	</info>
 
 	<dependencies>
+		<dependency org="dom4j" name="dom4j" rev="1.6.1"/>
+		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.7.7"/>
+		<dependency org="xerces" name="xercesImpl" rev="2.11.0"/>
+		<dependency org="com.perfectomobile" name="http-client" rev="latest.integration"/>
 		<dependency org="com.qmetry" name="qaf" rev="latest.integration" />
 		<dependency org="com.qmetry" name="qaf-support" rev="latest.integration" />
 		<dependency org="org.aspectj" name="aspectjtools" rev="1.8.5">
@@ -24,7 +28,6 @@
 		<dependency org="io.appium" name="java-client" rev="2.1.0"/>	
 		<dependency org="com.perfecto.reporting-sdk" name="reportium-java" rev="latest.integration"/>
 		<dependency org="com.perfectomobile" name="pm-webdriver" rev="latest.integration"/>
-        <dependency org="com.perfectomobile" name="http-client" rev="latest.integration"/>
         <dependency org="com.perfectomobile" name="intellij-connector" rev="latest.integration"/>
         
 		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.21"/>

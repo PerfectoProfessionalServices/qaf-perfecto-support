@@ -10,21 +10,21 @@ import static com.qmetry.qaf.automation.step.CommonStep.get;
 import static com.qmetry.qaf.automation.step.CommonStep.sendKeys;
 import static com.qmetry.qaf.automation.step.CommonStep.verifyPresent;
 import static com.qmetry.qaf.automation.step.CommonStep.waitForPresent;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.assertAppInfo;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.assertVisualText;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.cleanApp;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.closeApp;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.startApp;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.switchToContext;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.uninstallAllApps;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.uninstallApp;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.verifyAppInfo;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.waitForPresentImageVisual;
-import static com.qmetry.qaf.automation.support.perfecto.PerfectoUtils.waitForPresentTextVisual;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.assertAppInfo;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.assertVisualText;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.cleanApp;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.closeApp;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.startApp;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.switchToContext;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.uninstallAllApps;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.uninstallApp;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.verifyAppInfo;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.waitForPresentImageVisual;
+import static com.qmetry.qaf.automation.support.perfecto.DeviceUtils.waitForPresentTextVisual;
 
 import java.util.concurrent.TimeUnit;
 
-import com.qmetry.qaf.automation.support.perfecto.PerfectoUtils;
+import com.qmetry.qaf.automation.support.perfecto.DeviceUtils;
 import com.qmetry.qaf.automation.ui.WebDriverTestBase;
 import com.qmetry.qaf.automation.ui.webdriver.QAFExtendedWebDriver;
 
@@ -165,7 +165,7 @@ public class PerfectoCucumberSteps {
      */
     @Then("^I install application \"(.*?)\"$")
     public static void installApp(String application){
-        PerfectoUtils.installApp(application, getDriver(), false);
+        DeviceUtils.installApp(application, getDriver(), false);
     }
 
     /**
@@ -181,7 +181,7 @@ public class PerfectoCucumberSteps {
      */
     @Then("^I install instrumented application \"(.*?)\"$")
     public static void installInstrumentApp(String application){
-    	PerfectoUtils.installApp(application, getDriver(), true);
+    	DeviceUtils.installApp(application, getDriver(), true);
     }
 
     /**
@@ -290,7 +290,7 @@ public class PerfectoCucumberSteps {
      */
     @Then("^I should see text \"(.*?)\"$")
     public static boolean verifyVisualText(String text){
-        return PerfectoUtils.verifyVisualText(getDriver(),text);
+        return DeviceUtils.verifyVisualText(getDriver(),text);
     }
 
     /**
@@ -310,7 +310,7 @@ public class PerfectoCucumberSteps {
      */
     @Then("^I must see image \"(.*?)\"$")
     public static void assertVisualImg(String img){
-    	PerfectoUtils.assertVisualImg(getDriver(), img);
+    	DeviceUtils.assertVisualImg(getDriver(), img);
     }
 
     /**
@@ -325,7 +325,7 @@ public class PerfectoCucumberSteps {
      */
     @Then("^I should see image \"(.*?)\"$")
     public static void verifyVisualImg(String img){
-    	PerfectoUtils.verifyVisualImg(getDriver(), img);
+    	DeviceUtils.verifyVisualImg(getDriver(), img);
     }
 
     /**
